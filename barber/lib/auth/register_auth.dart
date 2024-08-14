@@ -1,14 +1,7 @@
-
-import 'package:barber/auth/login_auth.dart';
-import 'package:barber/views/home_view.dart';
-import 'package:barber/widgets/ASM.dart';
-import 'package:barber/widgets/constant.dart';
-import 'package:barber/widgets/loading.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:barbarapp/auth/login_auth.dart';
+import 'package:barbarapp/widgets/constant.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class RegisterAuth extends StatefulWidget {
   const RegisterAuth({super.key});
@@ -24,69 +17,59 @@ class _RegisterAuthState extends State<RegisterAuth> {
   var phoneController = TextEditingController();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
- final Asm ASM = Asm();
-  validateSignUpForm() {
-    if (nameController.text.trim().length < 3) {
-      ASM.showSnackBarmsg("Name Character must be at least 3 or more", context);
-    } else if (phoneController.text.trim().length < 8) {
-      ASM.showSnackBarmsg(
-          "Phone number  must be at least 8 or more numbers", context);
-    } else if (!emailController.text.contains("@")) {
-      ASM.showSnackBarmsg("Email not valid", context);
-    } else if (passwordController.text.trim().length < 5) {
-      ASM.showSnackBarmsg("Password must be at least 5 or more", context);
-    } else {
-      signupUserNow();
-    }
-  }
 
-  signupUserNow() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            LoadingDialog(textMessage: "Please wait....."));
-    try {
-      final User? firebaseuser = (await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
-                  email: emailController.text.trim(),
-                  password: passwordController.text.trim())
-              .catchError((c) {
-        Navigator.pop(context);
-        ASM.showSnackBarmsg(c.toString(), context);
-      }))
-          .user;
 
-      Map userDataMap = {
-        'name': nameController.text.trim(),
-        'phone': phoneController.text.trim(),
-        'email': emailController.text.trim(),
-        'password': passwordController.text.trim(),
-        'id': firebaseuser!.uid,
-        'blockStatus': "no"
-      };
-      FirebaseDatabase.instance
-          .ref()
-          .child("users")
-          .child(firebaseuser!.uid)
-          .set(userDataMap);
-      Navigator.pop(context);
-      ASM.showSnackBarmsg("Account created successfully!", context);
-      Navigator.push(context, MaterialPageRoute(builder: (c) => HomeView()));
-      QuickAlert.show(
-        context: context,
-        onConfirmBtnTap: () async {
-          await Future.delayed(Duration(seconds: 1));
-          Navigator.pop(context);
-        },
-        type: QuickAlertType.success,
-        text: 'Account Created Successfully!',
-      );
-    } on FirebaseAuthException catch (e) {
-      FirebaseAuth.instance.signOut();
-      Navigator.pop(context);
-      ASM.showSnackBarmsg(e.toString(), context);
-    }
-  }
+
+
+//  signupUserNow() async {
+//     showDialog(
+//         context: context,
+//         builder: (BuildContext context) =>
+//             // LoadingDialog(textMessage: "Please wait....."));
+//     try {
+//       final User? firebaseuser = (await FirebaseAuth.instance
+//               .createUserWithEmailAndPassword(
+//                   email: emailController.text.trim(),
+//                   password: passwordController.text.trim())
+//               .catchError((c) {
+//         Navigator.pop(context);
+//         ASM.showSnackBarmsg(c.toString(), context);
+//       }))
+//           .user;
+
+//       Map userDataMap = {
+//         'name': nameController.text.trim(),
+//         'phone': phoneController.text.trim(),
+//         'email': emailController.text.trim(),
+//         'password': passwordController.text.trim(),
+//         'id': firebaseuser!.uid,
+//         'blockStatus': "no"
+//       };
+//       FirebaseDatabase.instance
+//           .ref()
+//           .child("users")
+//           .child(firebaseuser!.uid)
+//           .set(userDataMap);
+//       Navigator.pop(context);
+//       ASM.showSnackBarmsg("Account created successfully!", context);
+//       Navigator.push(context, MaterialPageRoute(builder: (c) => HomeView()));
+//       QuickAlert.show(
+//         context: context,
+//         onConfirmBtnTap: () async {
+//           await Future.delayed(Duration(seconds: 1));
+//           Navigator.pop(context);
+//         },
+//         type: QuickAlertType.success,
+//         text: 'Account Created Successfully!',
+//       );
+//     } on FirebaseAuthException catch (e) {
+//       FirebaseAuth.instance.signOut();
+//       Navigator.pop(context);
+//       ASM.showSnackBarmsg(e.toString(), context);
+//     }
+//   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +127,6 @@ class _RegisterAuthState extends State<RegisterAuth> {
                       height: 12,
                     ),
                     TextField(
-                      controller: nameController,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -163,7 +145,6 @@ class _RegisterAuthState extends State<RegisterAuth> {
                       height: 12,
                     ),
                     TextField(
-                      controller: phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -182,7 +163,6 @@ class _RegisterAuthState extends State<RegisterAuth> {
                       height: 12,
                     ),
                     TextField(
-                      controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -201,7 +181,6 @@ class _RegisterAuthState extends State<RegisterAuth> {
                       height: 12,
                     ),
                     TextField(
-                      controller: passwordController,
                       obscureText: true,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
@@ -213,28 +192,23 @@ class _RegisterAuthState extends State<RegisterAuth> {
                     SizedBox(
                       height: 44,
                     ),
-                    InkWell(
-                      onTap: (){
-                        validateSignUpForm();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            gradient: LinearGradient(colors: [
-                              constant.bgColor,
-                              constant.lightBgColor
-                            ])),
-                        child: Center(
-                            child: Text(
-                          "Create Account",
-                          style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                              color: constant.primaryColor),
-                        )),
-                      ),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(colors: [
+                            constant.bgColor,
+                            constant.lightBgColor
+                          ])),
+                      child: Center(
+                          child: Text(
+                        "Create Account",
+                        style: TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                            color: constant.primaryColor),
+                      )),
                     ),
                     SizedBox(
                       height: 30,

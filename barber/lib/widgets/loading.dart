@@ -1,5 +1,4 @@
-
-import 'package:barber/widgets/constant.dart';
+import 'package:barbarapp/widgets/constant.dart';
 import 'package:flutter/material.dart';
 
 
@@ -29,7 +28,7 @@ class LoadingDialog extends StatelessWidget {
                     AlwaysStoppedAnimation<Color>(constant.primaryColor),
               ),
               SizedBox(
-                width: 13,
+                width: 8,
               ),
               Text(
                 textMessage,

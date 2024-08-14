@@ -1,7 +1,6 @@
-import 'package:barber/views/booking_view.dart';
-import 'package:barber/widgets/constant.dart';
-import 'package:barber/widgets/service_item.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:barbarapp/views/booking_view.dart';
+import 'package:barbarapp/widgets/constant.dart';
+import 'package:barbarapp/widgets/service_item.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatefulWidget {
@@ -13,7 +12,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final Constant constant = Constant();
-  FirebaseAuth user = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,14 +104,12 @@ class _HomeViewState extends State<HomeView> {
                     ServiceItem(
                       img: 'assets/images/facial.png',
                       text: 'Facial',
-                      callback: () {
-                        Navigator.push(
+                      callback: () { Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (c) => BookingView(
                                       service: "Facial",
-                                    )));
-                      },
+                                    )));},
                     ),
                   ],
                 ),
@@ -129,14 +125,12 @@ class _HomeViewState extends State<HomeView> {
                   ServiceItem(
                     img: 'assets/images/hair-cut.png',
                     text: 'hair cutting',
-                    callback: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => BookingView(
-                                    service: "hair cutting",
-                                  )));
-                    },
+                    callback: () { Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (c) => BookingView(
+                                      service: "hair cutting",
+                                    )));},
                   ),
                   SizedBox(
                     width: 12,
@@ -145,12 +139,12 @@ class _HomeViewState extends State<HomeView> {
                     img: 'assets/images/hair-comb.png',
                     text: 'hair comb',
                     callback: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => BookingView(
-                                    service: "hair comb",
-                                  )));
+                       Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (c) => BookingView(
+                                      service: "hair comb",
+                                    )));
                     },
                   ),
                 ],
@@ -166,14 +160,12 @@ class _HomeViewState extends State<HomeView> {
                   ServiceItem(
                     img: 'assets/images/hair-washing.png',
                     text: 'hair washing',
-                    callback: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => BookingView(
-                                    service: "hair washing",
-                                  )));
-                    },
+                    callback: () { Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (c) => BookingView(
+                                      service: "hair washing",
+                                    )));},
                   ),
                   SizedBox(
                     width: 12,
@@ -181,14 +173,12 @@ class _HomeViewState extends State<HomeView> {
                   ServiceItem(
                     img: 'assets/images/makeup.png',
                     text: 'Mackup',
-                    callback: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => BookingView(
-                                    service: "Mackup",
-                                  )));
-                    },
+                    callback: () { Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (c) => BookingView(
+                                      service: "Mackup",
+                                    )));},
                   ),
                 ],
               ),

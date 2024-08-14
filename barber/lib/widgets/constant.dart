@@ -6,6 +6,3 @@ class Constant {
   final lightBgColor = Color(0xffDFD3C3);
   final bgColor = Color(0xffF8EDE3);
 }
-
- String UserName='';
-String UserPhone='';

@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:barber/auth/login_auth.dart';
-import 'package:barber/views/home_view.dart';
-import 'package:barber/widgets/constant.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:barbarapp/views/home_view.dart';
+import 'package:barbarapp/widgets/constant.dart';
 import 'package:flutter/material.dart';
 
 class OnbordingView extends StatefulWidget {
@@ -26,11 +24,7 @@ class _OnbordingViewState extends State<OnbordingView> {
   NavigateHome() {
     Future.delayed(Duration(seconds: 4), () {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => FirebaseAuth.instance.currentUser == null
-                  ? LoginAuth()
-                  : HomeView()));
+          context, MaterialPageRoute(builder: (context) => HomeView()));
     });
   }
 
@@ -48,9 +42,8 @@ class _OnbordingViewState extends State<OnbordingView> {
           child: Column(
             children: [
               Image.asset(
-                "assets/images/logo.png",
-               color: constant.primaryColor,
-                width: 350,
+                "assets/images/onBord.png",
+                width: 300,
               ),
               SizedBox(
                 height: 120,
