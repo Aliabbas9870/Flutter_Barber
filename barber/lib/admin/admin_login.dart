@@ -1,98 +1,24 @@
+import 'package:barber/admin/booking_admin.dart';
 import 'package:barber/auth/forget_password.dart';
-import 'package:barber/auth/register_auth.dart';
-import 'package:barber/views/home_view.dart';
-import 'package:barber/widgets/ASM.dart';
 import 'package:barber/widgets/constant.dart';
-import 'package:barber/widgets/loading.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-class LoginAuth extends StatefulWidget {
-  const LoginAuth({super.key});
+import '../auth/register_auth.dart';
+
+class AdminLogin extends StatefulWidget {
+  const AdminLogin({super.key});
 
   @override
-  State<LoginAuth> createState() => _LoginAuthState();
+  State<AdminLogin> createState() => _AdminLoginState();
 }
 
-class _LoginAuthState extends State<LoginAuth> {
+class _AdminLoginState extends State<AdminLogin> {
   final Constant constant = Constant();
-  var emailController = TextEditingController();
+  var nameController = TextEditingController();
   var passwordController = TextEditingController();
-
-  final Asm ASM = Asm();
-
-  validateSignInForm() {
-    if (!emailController.text.contains("@")) {
-      ASM.showSnackBarmsg("Email not valid", context);
-    } else if (passwordController.text.trim().length < 5) {
-      ASM.showSnackBarmsg("Password must be at least 5 or more", context);
-    } else {
-      signInUserNow();
-    }
-  }
-
-  signInUserNow() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            LoadingDialog(textMessage: "Please wait....."));
-    try {
-      final User? firebaseuser = (await FirebaseAuth.instance
-              .signInWithEmailAndPassword(
-                  email: emailController.text.trim(),
-                  password: passwordController.text.trim())
-              .catchError((c) {
-        Navigator.pop(context);
-        ASM.showSnackBarmsg(c.toString(), context);
-      }))
-          .user;
-
-      if (firebaseuser != null) {
-        DatabaseReference ref = FirebaseDatabase.instance
-            .ref()
-            .child("users")
-            .child(firebaseuser!.uid);
-        await ref.once().then((dataSnapshot) {
-          if (dataSnapshot.snapshot.value != null) {
-            if ((dataSnapshot.snapshot.value as Map)["blockStatus"] == "no") {
-              UserName = (dataSnapshot.snapshot.value as Map)["name"];
-              UserPhone = (dataSnapshot.snapshot.value as Map)["phone"];
-              //   UserEmail = (dataSnapshot.snapshot.value as Map)["email"];
-              // UserPass = (dataSnapshot.snapshot.value as Map)["password"];
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => HomeView()));
-              ASM.showSnackBarmsg("Signin successfully!", context);
-              QuickAlert.show(
-                context: context,
-                autoCloseDuration: Duration(seconds: 1),
-                type: QuickAlertType.success,
-                text: 'signin Successfully!',
-              );
-            } else {
-              Navigator.pop(context);
-              FirebaseAuth.instance.signOut();
-              ASM.showSnackBarmsg(
-                  "You are Blocked please Contact  admin: aliabbascs59@gmail.com",
-                  context);
-            }
-          } else {
-            Navigator.pop(context);
-
-            FirebaseAuth.instance.signOut();
-            ASM.showSnackBarmsg("Your record not exit as  user", context);
-          }
-        });
-      }
-    } on FirebaseAuthException catch (e) {
-      FirebaseAuth.instance.signOut();
-      Navigator.pop(context);
-      ASM.showSnackBarmsg(e.toString(), context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +38,7 @@ class _LoginAuthState extends State<LoginAuth> {
                   constant.secondaryColor
                 ])),
                 child: Text(
-                  "Hello\nsign in!",
+                  "Admin\nPanel!",
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -141,7 +67,7 @@ class _LoginAuthState extends State<LoginAuth> {
                       height: 20,
                     ),
                     Text(
-                      "GMail",
+                      "Name",
                       style:
                           TextStyle(fontSize: 18, color: constant.primaryColor),
                     ),
@@ -149,12 +75,12 @@ class _LoginAuthState extends State<LoginAuth> {
                       height: 12,
                     ),
                     TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
+                      controller: nameController,
+                      keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "Enter the email",
-                          prefixIcon: Icon(Icons.email)),
+                          hintText: "Enter the UserName",
+                          prefixIcon: Icon(Icons.person)),
                     ),
                     SizedBox(
                       height: 20,
@@ -204,7 +130,8 @@ class _LoginAuthState extends State<LoginAuth> {
                     ),
                     InkWell(
                       onTap: () {
-                        validateSignInForm();
+                        // validateSignInForm();
+                        loginAdmin();
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10),
@@ -228,31 +155,6 @@ class _LoginAuthState extends State<LoginAuth> {
                     SizedBox(
                       height: 30,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have a account?",
-                          style: TextStyle(
-                              fontSize: 16, color: constant.primaryColor),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (c) => RegisterAuth()));
-                          },
-                          child: Text(
-                            "Create Account",
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: constant.primaryColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      ],
-                    )
                   ],
                 ),
               )
@@ -261,5 +163,39 @@ class _LoginAuthState extends State<LoginAuth> {
         ),
       ),
     );
+  }
+
+  loginAdmin() {
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.loading,
+      title: 'Please wait',
+      text: '',
+    );
+    FirebaseFirestore.instance.collection("Admin").get().then((snapShot) {
+      snapShot.docs.forEach((result) {
+        if (result.data()['id'] != nameController.text.trim()) {
+          QuickAlert.show(
+            context: context,
+            autoCloseDuration: Duration(seconds: 1),
+            type: QuickAlertType.success,
+            title: "User",
+            text: 'your id is not correct',
+          );
+        } else if (result.data()['password'] !=
+            passwordController.text.trim()) {
+          QuickAlert.show(
+            context: context,
+            autoCloseDuration: Duration(seconds: 1),
+            type: QuickAlertType.success,
+            title: "User",
+            text: 'your password is not correct',
+          );
+        } else {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (c) => BookingAdmin()));
+        }
+      });
+    });
   }
 }

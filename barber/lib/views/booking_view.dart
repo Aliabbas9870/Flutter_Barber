@@ -1,5 +1,10 @@
-import 'package:barbarapp/widgets/constant.dart';
+import 'package:barber/services/database.dart';
+import 'package:barber/services/sharePref.dart';
+import 'package:barber/widgets/constant.dart';
+import 'package:barber/widgets/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class BookingView extends StatefulWidget {
   String service;
@@ -12,6 +17,27 @@ class BookingView extends StatefulWidget {
 
 class _BookingViewState extends State<BookingView> {
   final Constant constant = Constant();
+
+  String? name, image, email;
+  getDataFromShare() async {
+    name = await sharePref().getUserName();
+    image = await sharePref().getUserImage();
+    name = await sharePref().getUserName();
+    setState(() {});
+  }
+
+  getLoadData() async {
+    await getDataFromShare();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getLoadData();
+    super.initState();
+  }
+
   DateTime slectDate = DateTime.now();
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pick = await showDatePicker(
@@ -188,24 +214,61 @@ class _BookingViewState extends State<BookingView> {
                     height: 12,
                   ),
                   InkWell(
-                    child: Container(
+                      onTap: () async {
+                        // Show "Please wait" message
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.loading,
+                          title: 'Please wait',
+                          text: 'Saving your booking...',
+                        );
+
+                        Map<String, dynamic> userBookingMap = {
+                          "Service": widget.service,
+                          "Date":
+                              "${slectDate.day}/${slectDate.month}/${slectDate.year}"
+                                  .toString(),
+                          "Time": slectTime.format(context).toString(),
+                          "Name": name,
+                          "Image": image,
+                          "Email": email,
+                        };
+
+                        await DataBaseMethod()
+                            .adduserBooking(userBookingMap)
+                            .then((val) {
+                          // Close the "Please wait" message
+                          Navigator.pop(context);
+
+                          // Show success message
+                          QuickAlert.show(
+                            context: context,
+                            onConfirmBtnTap: () async {
+                              await Future.delayed(Duration(seconds: 0));
+                              Navigator.pop(context);
+                            },
+                            type: QuickAlertType.success,
+                            text: 'Service has been booked successfully!',
+                          );
+                        });
+                      },
+                      child: Container(
                         width: MediaQuery.of(context).size.width,
+                        height: 70,
                         // height: MediaQuery.of(context).size.height,
                         decoration: BoxDecoration(
                             color: constant.secondaryColor,
                             borderRadius: BorderRadius.circular(12)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextButton(
-                              onPressed: () {},
-                              child: Center(
-                                  child: Text("BOOK NOW",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: constant.primaryColor)))),
-                        )),
-                  )
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text("BOOK NOW",
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: constant.primaryColor)),
+                            )),
+                      ))
                 ])));
   }
 }

@@ -1,4 +1,5 @@
-import 'package:barbarapp/widgets/constant.dart';
+
+import 'package:barber/widgets/constant.dart';
 import 'package:flutter/material.dart';
 
 class ServiceItem extends StatelessWidget {
